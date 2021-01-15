@@ -17,6 +17,8 @@ int distances[POINTS][POINTS] = {
 	{37879,37300,1,8763},
 	{40121,39542,7635,209}
 };
+
+// вывод точок и их кластеров
 typedef vector<vector<point>> clusters;
 ostream& operator<<(ostream& os, clusters cs) {
 	os << '~' << endl;
@@ -26,6 +28,8 @@ ostream& operator<<(ostream& os, clusters cs) {
 	os << '~' << endl;
 	return os;
 }
+
+// расстояние между 2 кластерами
 typedef vector<point> cluster;
 int distance(cluster a, cluster b) {
 	int d;
@@ -37,17 +41,20 @@ int distance(cluster a, cluster b) {
 				if (distances[a[i].id][b[j].id] < d)
 					d = distances[a[i].id][b[j].id];
 			}
+	if(/*более точно*/0)
 	for (int i = 0; i < b.size(); i++)
 		for (int j = 0; j < a.size(); j++)
 			if (distances[b[i].id][a[j].id] < d)
 				d = distances[b[i].id][a[j].id];
 	return d;
 }
+
+// соединяет два ближайших кластера
 void connectNearest(clusters& clusters) {
 	if (clusters.size() == 1) return;
 	int a, b, d;
 	for (int i = 0; i < clusters.size(); i++) {
-		for (int j = 0; j < clusters.size(); j++)
+		for (int j = i+1; j < clusters.size(); j++)
 			if (i != j) {
 				if (!i && j == 1) {
 					a = 0;
@@ -69,11 +76,15 @@ void connectNearest(clusters& clusters) {
 	}
 	clusters.erase(clusters.begin() + b);
 }
+
 int main() {
+	// запихиваем наши точки в отдельные кластеры
 	clusters clusters;
 	for (int i = 0; i < POINTS; i++)
 		clusters.push_back({points[i]});
 	cout << clusters;
+
+	// обьединяем кластеры пока не получим супер кластер
 	while (clusters.size() > 1) {
 		connectNearest(clusters);
 		cout << clusters;
